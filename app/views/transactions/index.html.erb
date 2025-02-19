@@ -1,9 +1,68 @@
 <h1>KelloggCoin Ledger</h1>
 
 <!-- Step 1: List all transactions, starting with the ICO -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transaction List</title>
+</head>
+<body>
+    <h1>Transaction List</h1>
+    <ol id="transactionList"></ol>
+
+    <script>
+        // Array of transactions
+        const transactions = [
+            { from_user: null, to_user: "Ben", amount: 10000 },
+            { from_user: null, to_user: "Brian", amount: 10000 },
+            { from_user: "Ben", to_user: "Brian", amount: 1557 },
+            { from_user: "Ben", to_user: "Evan", amount: 3000 },
+            { from_user: "Brian", to_user: "Anthony", amount: 1164 },
+            { from_user: "Evan", to_user: "Krystina", amount: 3516 },
+            { from_user: "Anthony", to_user: "Ben", amount: 2516 }
+        ];
+
+        // Reference to the ordered list element
+        const list = document.getElementById("transactionList");
+
+        // Loop through each transaction and create list items
+        transactions.forEach(transaction => {
+            const listItem = document.createElement("li");
+
+            // Check if it's an ICO (Initial Coin Offering)
+            if (!transaction.from_user) {
+                listItem.textContent = `Initial coin offering: ${transaction.amount} KC to ${transaction.to_user}`;
+            } else {
+                listItem.textContent = `${transaction.amount} KC from ${transaction.from_user} to ${transaction.to_user}`;
+            }
+
+            // Append the list item to the ordered list
+            list.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>
 
 <!-- Step 2: Calculate and display the balances -->
+class TransactionsController < ApplicationController
+  def index
+    # Fetch all users
+    @users = User.all
 
+    # Calculate the balance for each user using SUM
+    @balances = @users.map do |user|
+      # Sum amounts received
+      received = Transaction.where(to_user_id: user.id).sum(:amount)
+      
+      # Sum amounts sent
+      sent = Transaction.where(from_user_id: user.id).sum(:amount)
+      
+      # Calculate final balance
+      { user: user, balance: received - sent }
+    end
+  end
+end
 <!-- 
 Expected balances:
 Balance for Brian: 1348 KC
